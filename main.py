@@ -82,6 +82,7 @@ def guessing_game():
                 print("\nThanks for playing! Goodbye!")
                 sys.exit(0)
 
+# Start the game when the script is run
 if __name__ == "__main__":
     try:
         guessing_game()
