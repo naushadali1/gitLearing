@@ -1,84 +1,90 @@
 import random
 import sys
+from time import sleep
 
 def guessing_game():
-    # Generate a random number between 1 and 100
-    secret_number = random.randint(1, 100)
-    attempts = 0
-    max_attempts = 10
-    guess = None  # Initialize guess variable
-    
-    print("Welcome to the Guessing Game!")
-    print(f"I'm thinking of a number between 1 and 100. You have {max_attempts} attempts to guess it.")
-    
-    while attempts < max_attempts:
-        attempts += 1
-        remaining_attempts = max_attempts - attempts + 1
+    while True:  # Game loop
+        # Game setup
+        secret_number = random.randint(1, 100)
+        attempts = 0
+        max_attempts = 10
+        guess_history = []
         
-        while True:  # Inner loop for input validation
-            try:
-                user_input = input(f"\nAttempt {attempts}/{max_attempts}. Enter your guess: ")
-                
-                # Allow user to exit the game early
-                if user_input.lower() in ['quit', 'exit', 'q']:
-                    print(f"\nGame exited. The secret number was {secret_number}.")
-                    return
-                
-                guess = int(user_input)
-                
-                # Validate number is within range
-                if guess < 1 or guess > 100:
-                    print("Please enter a number between 1 and 100.")
-                    continue
-                    
-                break  # Exit input validation loop if input is valid
-                
-            except ValueError:
-                print("Invalid input. Please enter a whole number between 1 and 100.")
-                continue
-            except KeyboardInterrupt:
-                print("\n\nGame interrupted by user. Exiting...")
-                sys.exit(0)
-            except Exception as e:
-                print(f"An unexpected error occurred: {e}. Please try again.")
-                continue
+        # Clear screen and show welcome
+        print("\n" * 50)  # Simple screen clear
+        print("🌟 Welcome to the Ultimate Guessing Game! 🌟")
+        print(f"I've picked a number between 1 and 100. Can you guess it in {max_attempts} tries?\n")
+        
+        while attempts < max_attempts:
+            attempts += 1
+            remaining = max_attempts - attempts
             
-        # Game logic after successful input
-        if guess < secret_number:
-            print(f"Too low! You have {remaining_attempts - 1} attempts remaining.")
-        elif guess > secret_number:
-            print(f"Too high! You have {remaining_attempts - 1} attempts remaining.")
-        else:
-            print(f"\nCongratulations! You guessed the number {secret_number} in {attempts} attempts!")
-            break
-    
-    # Final game state check
-    if attempts >= max_attempts and guess != secret_number:
-        print(f"\nGame over! You've used all {max_attempts} attempts.")
-        print(f"The secret number was {secret_number}.")
-
-    # Ask if player wants to play again
-    while True:
-        try:
-            play_again = input("\nWould you like to play again? (yes/no): ").lower()
-            if play_again in ['yes', 'y']:
-                guessing_game()
-                return
-            elif play_again in ['no', 'n']:
-                print("Thanks for playing! Goodbye.")
-                return
+            # Get and validate user input
+            while True:
+                try:
+                    prompt = f"Attempt {attempts}/{max_attempts}. Your guess (1-100) or 'hint': "
+                    user_input = input(prompt).strip().lower()
+                    
+                    # Special commands
+                    if user_input in ['quit', 'exit', 'q']:
+                        print(f"\nGame exited. The number was {secret_number}.")
+                        return
+                    elif user_input == 'hint':
+                        hint = "even" if secret_number % 2 == 0 else "odd"
+                        print(f"Hint: The number is {hint}")
+                        continue
+                    elif user_input == 'history':
+                        print("Your guesses:", ", ".join(map(str, guess_history)))
+                        continue
+                    
+                    guess = int(user_input)
+                    
+                    if guess < 1 or guess > 100:
+                        print("Please enter a number between 1 and 100.")
+                        continue
+                        
+                    guess_history.append(guess)
+                    break
+                    
+                except ValueError:
+                    print("Invalid input. Please enter a number or command (hint/history/quit).")
+                except KeyboardInterrupt:
+                    print("\n\nGame interrupted. The number was", secret_number)
+                    sys.exit(0)
+            
+            # Check guess
+            if guess == secret_number:
+                print(f"\n🎉 Congratulations! You guessed {secret_number} in {attempts} attempts!")
+                print(f"Your guesses: {', '.join(map(str, guess_history))}")
+                break
+            elif guess < secret_number:
+                print(f"Too low! {remaining} attempts remaining.")
             else:
-                print("Please enter 'yes' or 'no'.")
-        except KeyboardInterrupt:
-            print("\n\nGame interrupted by user. Exiting...")
-            sys.exit(0)
-        except Exception as e:
-            print(f"An error occurred: {e}. Please try again.")
+                print(f"Too high! {remaining} attempts remaining.")
+        
+        # Game over handling
+        if guess != secret_number:
+            print(f"\nGame over! The number was {secret_number}.")
+            print(f"Your guesses: {', '.join(map(str, guess_history))}")
+        
+        # Play again prompt
+        while True:
+            try:
+                choice = input("\nPlay again? (y/n): ").lower()
+                if choice in ['y', 'yes']:
+                    break
+                elif choice in ['n', 'no']:
+                    print("Thanks for playing! Goodbye!")
+                    return
+                else:
+                    print("Please enter 'y' or 'n'.")
+            except KeyboardInterrupt:
+                print("\nThanks for playing! Goodbye!")
+                sys.exit(0)
 
-# Start the game
 if __name__ == "__main__":
     try:
         guessing_game()
     except Exception as e:
-        print(f"A critical error occurred: {e}")
+        print(f"An error occurred: {e}")
         sys.exit(1)
