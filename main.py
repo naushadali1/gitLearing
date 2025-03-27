@@ -26,7 +26,7 @@ def guessing_game():
         else:
             print(f"\nCongratulations! You guessed the number {secret_number} in {attempts} attempts!")
             break
-    
+    # Exeption with simple if statements
     if attempts >= max_attempts and guess != secret_number:
         print(f"\nGame over! You've used all {max_attempts} attempts.")
         print(f"The secret number was {secret_number}.")
